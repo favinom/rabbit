@@ -1,7 +1,11 @@
 #include "RabbitApp.h"
 #include "Moose.h"
 #include "AppFactory.h"
-#include "ModulesApp.h"
+//#include "ModulesApp.h"
+
+#include"ElectrocardioMonodomainDiffusion.h"
+#include"ElectrocardioTimeDerivative.h"
+#include"FixedRotation.h"
 
 template<>
 InputParameters validParams<RabbitApp>()
@@ -19,11 +23,11 @@ RabbitApp::RabbitApp(InputParameters parameters) :
     MooseApp(parameters)
 {
   Moose::registerObjects(_factory);
-  ModulesApp::registerObjects(_factory);
+  //ModulesApp::registerObjects(_factory);
   RabbitApp::registerObjects(_factory);
 
   Moose::associateSyntax(_syntax, _action_factory);
-  ModulesApp::associateSyntax(_syntax, _action_factory);
+  //ModulesApp::associateSyntax(_syntax, _action_factory);
   RabbitApp::associateSyntax(_syntax, _action_factory);
 }
 
@@ -44,6 +48,11 @@ extern "C" void RabbitApp__registerObjects(Factory & factory) { RabbitApp::regis
 void
 RabbitApp::registerObjects(Factory & factory)
 {
+    registerKernel(ElectrocardioMonodomainDiffusion);
+    registerKernel(ElectrocardioTimeDerivative);
+    
+    registerMaterial(FixedRotation);
+    
 }
 
 // External entry point for dynamic syntax association
