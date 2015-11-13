@@ -71,7 +71,7 @@
 [Functions]
   [./forcing_func]
     type = ParsedFunction
-    value = '50000.0*(x<1.5)*(y<1.5)*(z<1.5)*(t<2.0)'
+    value = '50.0*(x<=1.5)*(y<=1.5)*(z<=1.5)*(t<=2.0)'
   [../]
 []
 
@@ -85,7 +85,7 @@
 
  [./conductivity]
  type = MonodomainConductivity
- conductivities = '133.4 17.0 17.0'  ## check units
+ conductivities = '0.1334 0.1334 0.1334'  ## check units 0.0176
  block = 0
  [../]
 
