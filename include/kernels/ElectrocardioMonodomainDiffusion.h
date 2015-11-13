@@ -45,7 +45,7 @@ protected:
 private:
   Real _surface_to_volume;
 
-  //const MaterialProperty<RealTensorValue> &_conductivity;
+  const MaterialProperty<RealTensorValue> &_conductivity;
 };
 
 #endif

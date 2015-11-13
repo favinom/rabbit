@@ -6,16 +6,16 @@
 # uniform_refine = 0
  type = GeneratedMesh
  dim = 3
- nx = 3
+ nx = 20
  ny = 7
- nz = 20
+ nz = 3
  xmin = 0.0
- xmax = 3.0
+ xmax = 20.0
  ymin = 0.0
  ymax = 7.0
  zmin = 0.0
- zmax = 20.0
- elem_type = HEX27
+ zmax = 3.0
+# elem_type = HEX27
  []
 
 [Variables]
@@ -27,13 +27,13 @@
     [../]
  [../]
 []
-
-#[AuxVariables]
-#  [./disp_x]    order=FIRST     family = LAGRANGE  [../]
+ 
+[AuxVariables]
+  [./temp]    order=FIRST     family = LAGRANGE  [../]
 #  [./disp_y]    order=FIRST     family = LAGRANGE  [../]
 #  [./disp_z]    order=FIRST     family = LAGRANGE  [../]
 #  [./thickness_parameter_from_up] order = FIRST family = LAGRANGE [../]
-#[]
+[]
 
 [Kernels]
 [./euler]
@@ -62,6 +62,12 @@
 
 []
 
+ [AuxKernels]
+ [./prova]
+ type = NodalPostProcessorAux variable = temp potential = potential
+[../]
+ []
+ 
 [Functions]
   [./forcing_func]
     type = ParsedFunction
@@ -73,36 +79,15 @@
  [./FTE]
  block =0
  type =FixedRotation
- E_fiber = '0 0 1'
+ E_fiber = '1 0 0'
  E_sheet = '0 1 0'
  [../]
 
- 
-#[./ElasticityPiolaTransformation]
-# type = ElasticityPiolaTransformation
-# block =1
-# disp_x = disp_x
-# disp_y = disp_y
-# disp_z = disp_z
-# [../]
-
-# [./conductivity]
-# type = MonodomainConductivity
-# conductivities = '0.006 0.006 0.006'
-# block = 1
-# [../]
-
-#[./ApplyPiolaTransformation]
-# type = ApplyPiolaTransformation
-# block = 1
-#[../]
- 
-#  [./electrocardio]
-#    type = Electrocardio
-#    vmem = 'potential'
-#    block = 1
-#    outputs = all
-#  [../]
+ [./conductivity]
+ type = MonodomainConductivity
+ conductivities = '133.4 17.0 17.0'  ## check units
+ block = 0
+ [../]
 
 []
 

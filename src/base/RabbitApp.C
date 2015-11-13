@@ -6,6 +6,9 @@
 #include"ElectrocardioMonodomainDiffusion.h"
 #include"ElectrocardioTimeDerivative.h"
 #include"FixedRotation.h"
+#include"MonodomainConductivity.h"
+
+#include "NodalPostProcessorAux.h"
 
 template<>
 InputParameters validParams<RabbitApp>()
@@ -52,6 +55,9 @@ RabbitApp::registerObjects(Factory & factory)
     registerKernel(ElectrocardioTimeDerivative);
     
     registerMaterial(FixedRotation);
+    registerMaterial(MonodomainConductivity);
+    
+    registerAuxKernel(NodalPostProcessorAux);
     
 }
 

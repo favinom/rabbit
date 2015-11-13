@@ -42,10 +42,8 @@ ElectrocardioMonodomainDiffusion::ElectrocardioMonodomainDiffusion(const InputPa
     Kernel(parameters),
 
     //we need to specify the surface to volume parameter:
-     _surface_to_volume(getParam<Real>("surface_to_volume"))//,
-    
-    //inherit some material properties:
-    //_conductivity(getMaterialProperty<RealTensorValue>("conductivity"))
+     _surface_to_volume(getParam<Real>("surface_to_volume")),
+    _conductivity(getMaterialProperty<RealTensorValue>("conductivity"))
     {}
 
 ElectrocardioMonodomainDiffusion::~ElectrocardioMonodomainDiffusion() {}
@@ -55,7 +53,7 @@ Real ElectrocardioMonodomainDiffusion::computeQpResidual() {
 //contruction of the diffusive kernel 
 //and contraction with the gradient of the test function
   //return  ( _grad_test[_i][_qp] * (_conductivity[_qp] * _grad_u[_qp]) );
-    return (1.0 / _surface_to_volume) *_grad_test[_i][_qp]* _grad_u[_qp];
+    return (1.0 / _surface_to_volume) *_grad_test[_i][_qp] * (_conductivity[_qp] * _grad_u[_qp]);
 }
 
 Real ElectrocardioMonodomainDiffusion::computeQpJacobian()
@@ -63,5 +61,5 @@ Real ElectrocardioMonodomainDiffusion::computeQpJacobian()
   //contruction of the diffusive kernel
   //and contraction with the gradient of the test function
   //return (1.0 / _surface_to_volume) * ( _grad_test[_i][_qp] * (_conductivity[_qp] * _grad_phi[_j][_qp])       );
-    return (1.0 / _surface_to_volume) *_grad_test[_i][_qp]*_grad_phi[_j][_qp];
+    return (1.0 / _surface_to_volume) *_grad_test[_i][_qp]* (_conductivity[_qp] * _grad_phi[_j][_qp]);
 }
