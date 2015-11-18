@@ -10,6 +10,12 @@
 
 #include "NodalPostProcessorAux.h"
 
+#include "RichardsMultiphaseProblem.h"
+
+#include "NonLinearReaction.h"
+#include "FN.h"
+#include "Electrocardio.h"
+
 template<>
 InputParameters validParams<RabbitApp>()
 {
@@ -53,11 +59,17 @@ RabbitApp::registerObjects(Factory & factory)
 {
     registerKernel(ElectrocardioMonodomainDiffusion);
     registerKernel(ElectrocardioTimeDerivative);
+    registerKernel(NonLinearReaction);
     
     registerMaterial(FixedRotation);
+    registerMaterial(FN);
     registerMaterial(MonodomainConductivity);
+    registerMaterial(Electrocardio);
     
     registerAuxKernel(NodalPostProcessorAux);
+    
+    
+      registerProblem(RichardsMultiphaseProblem);
     
 }
 

@@ -6,15 +6,15 @@
 # uniform_refine = 0
  type = GeneratedMesh
  dim = 3
- nx = 40
- ny = 14
- nz = 6
+ nx = 80
+ ny = 4
+ nz = 4
  xmin = 0.0
- xmax = 2.0
+ xmax = 20.0
  ymin = 0.0
- ymax = 0.7
+ ymax = 1.0
  zmin = 0.0
- zmax = 0.3
+ zmax = 1.0
 # elem_type = HEX27
  []
 
@@ -28,8 +28,9 @@
  [./potential]  order=FIRST  family=LAGRANGE
     [./InitialCondition]
 #type = RandomIC
-        type = ConstantIC
-        value = -85.23
+        type = FunctionIC
+        function = init_cond
+#value = -85.23
     [../]
  [../]
 []
@@ -44,14 +45,14 @@
 [Kernels]
 [./euler]
  type = ElectrocardioTimeDerivative
- capacitance = 1.0
+ capacitance = 0.01
  variable = potential
 [../]
 
 [./diff]
  type = ElectrocardioMonodomainDiffusion
  variable = potential
- surface_to_volume = 1400.0
+ surface_to_volume = 140.0
 [../]
 
  [./forcing]
@@ -82,8 +83,13 @@
 [Functions]
   [./forcing_func]
     type = ParsedFunction
-    value = '35.714285*(x<=0.15)*(y<=0.15)*(z<=0.15)*(t<=2.0)'
+    value = '0.0*(x<=1.5)*(y<=1.5)*(z<=1.5)*(t<=2.0)'
   [../]
+ [./init_cond]
+ type = ParsedFunction
+ value = ' -85.23*(x<=10.0) + 30*(x>10.0)' # -27.615*(x==10.0)
+ [../]
+
 []
 
 [Materials]
@@ -96,7 +102,7 @@
 
  [./conductivity]
  type = MonodomainConductivity
- conductivities = '1.3341 0.1760 0.1760'  ## check units 0.1760
+ conductivities = '0.13341 0.0176 0.0176'  ## check units 0.1760
  block = 0
  [../]
  
@@ -133,7 +139,7 @@
 # petsc_options_value=' newtonls   preonly   lu       NONZERO'
 
 #nl_rel_tol=0.999999999
-#  nl_abs_tol=0.9
+  nl_abs_tol=1e-7
 #  nl_rel_step_tol=1e1
 #  nl_abs_step_tol=1e1
 
@@ -144,8 +150,8 @@
 
   start_time=   0.0
   end_time  =   100.0
-  dtmin     =   0.25
-  dtmax     =   0.5
+  dtmin     =   0.1
+  dtmax     =   0.2
 []
 
 
@@ -159,6 +165,7 @@
 
    [./out]
   type=Exodus
-   output_initial = true
+  output_initial = true
+#output_on = ''
   [../]
  []
