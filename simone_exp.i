@@ -27,19 +27,14 @@
 [Variables]
  [./potential]  order=FIRST  family=LAGRANGE
     [./InitialCondition]
-#type = RandomIC
-        type = FunctionIC
-        function = init_cond
-#value = -85.23
+        type = ConstantIC
+        value = -85.23
     [../]
  [../]
 []
  
 [AuxVariables]
   [./temp]    order=FIRST     family = LAGRANGE  [../]
-#  [./disp_y]    order=FIRST     family = LAGRANGE  [../]
-#  [./disp_z]    order=FIRST     family = LAGRANGE  [../]
-#  [./thickness_parameter_from_up] order = FIRST family = LAGRANGE [../]
 []
 
 [Kernels]
@@ -55,6 +50,13 @@
  surface_to_volume = 140.0
 [../]
  
+ [./forcing]
+ type = UserForcingFunction
+ variable = potential
+ function = forcing_func
+ [../]
+
+ 
 []
  
 [Functions]
@@ -62,6 +64,12 @@
  type = ParsedFunction
  value = ' -85.23*(x<=10.0) + 30*(x>10.0)' # -27.615*(x==10.0)
  [../]
+ 
+ [./forcing_func]
+ type = ParsedFunction
+ value = '50.0*(x<=1.5)*(y<=1.5)*(z<=1.5)*(t<=2.0)'
+ [../]
+
 
 []
 
