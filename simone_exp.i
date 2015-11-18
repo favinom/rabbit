@@ -54,25 +54,8 @@
  variable = potential
  surface_to_volume = 140.0
 [../]
-
-[./NonLinearReaction]
- type = NonLinearReaction
- variable = potential
- [../]
  
-#[./ecforcing]
-# type = DeformedElectrocardioForcing
-# variable = potential
-# forcing_function = ElectrocardioForcing_function
-#[../]
-
 []
-
-#[AuxKernels]
-# [./prova]
-# type = NodalPostProcessorAux variable = temp potential = potential
-#[../]
-# []
  
 [Functions]
  [./init_cond]
@@ -96,14 +79,6 @@
  block = 0
  [../]
  
- [./FN]
- block =0
-# type =Electrocardio
- type = FN
- vmem = -85.23
- potential = potential
- [../]
-
 []
 
 # [Preconditioning]
