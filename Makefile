@@ -18,6 +18,7 @@ endif
 FRAMEWORK_DIR      := $(MOOSE_DIR)/framework
 include $(FRAMEWORK_DIR)/build.mk
 include $(FRAMEWORK_DIR)/moose.mk
+#rabbit_CXXFLAGS = -std=c++11
 
 ################################## MODULES ####################################
 #ALL_MODULES := yes
@@ -29,6 +30,7 @@ APPLICATION_DIR    := $(CURDIR)
 APPLICATION_NAME   := rabbit
 BUILD_EXEC         := yes
 DEP_APPS           := $(shell $(FRAMEWORK_DIR)/scripts/find_dep_apps.py $(APPLICATION_NAME))
+ADDITIONAL_LIBS    := $(HOME)/dev/lugano/ioniclib/bernus.o -L/Developer/NVIDIA/CUDA-7.5/lib -lcudart
 include            $(FRAMEWORK_DIR)/app.mk
 
 ###############################################################################

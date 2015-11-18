@@ -10,6 +10,7 @@
 #define RICHARDSMULTIPHASEPROBLEM_H
 
 #include "FEProblem.h"
+#include "BernusModel.h"
 
 class RichardsMultiphaseProblem;
 
@@ -30,7 +31,8 @@ public:
   /**
    * extracts the moose variable numbers associated with bounded_var and lower_var
    */
-  virtual void initialSetup();
+    virtual void initialSetup();
+    virtual void timestepSetup();
 
   /// returns true, indicating that updateSolution should be run
   virtual bool shouldUpdateSolution();
@@ -58,6 +60,9 @@ protected:
   /// internal moose variable number associated with _lower_var
   unsigned int _lower_var_num;
 
+  BernusModel* ionicmodel;
+  int counter;
+  bool upsol;
 };
 
 #endif /* RICHARDSMULTIPHASEPROBLEM_H */

@@ -28,7 +28,7 @@
  [./potential]  order=FIRST  family=LAGRANGE
     [./InitialCondition]
         type = ConstantIC
-        value = -85.23
+        value = -92.0
     [../]
  [../]
 []
@@ -60,14 +60,10 @@
 []
  
 [Functions]
- [./init_cond]
- type = ParsedFunction
- value = ' -85.23*(x<=10.0) + 30*(x>10.0)' # -27.615*(x==10.0)
- [../]
  
  [./forcing_func]
  type = ParsedFunction
- value = '50.0*(x<=1.5)*(y<=1.5)*(z<=1.5)*(t<=2.0)'
+ value = '0.35*(x<=1.5)*(y<=1.5)*(z<=1.5)*(t<=2.0)'
  [../]
 
 
@@ -101,18 +97,18 @@
 [Executioner]
 
   type=Transient
-  solve_type=PJFNK
+  solve_type=NEWTON
  
 #line_search = 'none'
  
  petsc_options_iname=' -ksp_type -pc_type -pc_factor_shift_type -pc_factor_mat_solver_package '
- petsc_options_value='   preonly   lu       NONZERO               mumps         '
+ petsc_options_value=' preonly    lu       NONZERO               mumps         '
  
 # petsc_options_iname='-snes_type -ksp_type -pc_type -pc_factor_shift_type '
 # petsc_options_value=' newtonls   preonly   lu       NONZERO'
 
-nl_rel_tol=0.999999999
-#  nl_abs_tol=1e-7
+#nl_rel_tol=0.999999999
+  nl_abs_tol=1e-7
 #  nl_rel_step_tol=1e1
 #  nl_abs_step_tol=1e1
 
@@ -124,7 +120,7 @@ nl_rel_tol=0.999999999
   start_time=   0.0
   end_time  =   100.0
   dtmin     =   0.1
-  dtmax     =   0.2
+  dtmax     =   0.1
 []
 
 

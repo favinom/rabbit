@@ -27,11 +27,14 @@ RichardsMultiphaseProblem::RichardsMultiphaseProblem(const InputParameters & par
     _bounded_var_name(params.get<NonlinearVariableName>("bounded_var")),
     _lower_var_name(params.get<NonlinearVariableName>("lower_var")),
     _bounded_var_num(0),
-    _lower_var_num(0)
+    _lower_var_num(0),
+    upsol(false)
 {}
 
 RichardsMultiphaseProblem::~RichardsMultiphaseProblem()
-{}
+{
+  delete ionicmodel;
+}
 
 void
 RichardsMultiphaseProblem::initialSetup()
@@ -53,14 +56,54 @@ RichardsMultiphaseProblem::initialSetup()
   _bounded_var_num = bounded.number();
   _lower_var_num = lower.number();
 
+  int N = std::distance(_mesh.getMesh().local_nodes_begin(),
+      _mesh.getMesh().local_nodes_end());
+  ionicmodel = new BernusModel(N,true,true);
+  int counter = 0;
+  upsol = true;
+
+  //std::cout << N << std::endl;
+  //MeshBase::node_iterator nit = _mesh.getMesh().local_nodes_begin();
+  //const MeshBase::node_iterator nend = _mesh.getMesh().local_nodes_end();
+
   FEProblem::initialSetup();
 }
 
+void
+RichardsMultiphaseProblem::timestepSetup()
+{
+    FEProblem::timestepSetup();
+    
+    unsigned int sys_num = getNonlinearSystem().number();
+    NumericVector<Number>& sol = _nl.solutionOld();
+    MeshBase::node_iterator nit = _mesh.getMesh().local_nodes_begin();
+    const MeshBase::node_iterator nend = _mesh.getMesh().local_nodes_end();
+    
+    std::vector<dof_id_type> dofs;
+    for ( ; nit != nend; ++nit)
+    {
+        const Node & node = *(*nit);
+        dofs.push_back(node.dof_number(sys_num, _bounded_var_num, 0));
+    }
+    std::vector<double> v(dofs.size());
+    sol.get(dofs,v);
+
+    if (counter==0)
+        ionicmodel->initstate(&v[0]);
+    ionicmodel->modelstep(&v[0],_dt);
+    counter++;
+    
+    // assign back the values
+    for (int i=0;i<v.size();++i)
+        sol.set(dofs[i],v[i]);
+    
+    sol.close();
+}
 
 bool
 RichardsMultiphaseProblem::shouldUpdateSolution()
 {
-  return true;
+  return false;
 }
 
 bool
@@ -84,53 +127,19 @@ RichardsMultiphaseProblem::updateSolution(NumericVector<Number>& vec_solution, N
     }
     std::vector<double> v(dofs.size());
     vec_solution.get(dofs,v);
-    for (int i=0;i<v.size();++i)
-    {
-        //Real u = (v[i]+85.23)/100.0;
-        //Real _Iion =8.0*u*(u-0.15)*(u-1.0);
 
-        Real _Iion=1.4e-5*(v[i]-30.0)*(v[i]+85.23)*(v[i]+57.6);
-        
-        v[i]=v[i]+0.2*_Iion;
-    }
+    // update with the external solver
+    if (counter==2) ionicmodel->initstate(&v[0]);
+    //if (_dt >= 0.009)
+    ionicmodel->modelstep(&v[0],_dt/2.);
+
+    // assign back the values
     for (int i=0;i<v.size();++i)
         vec_solution.set(dofs[i],v[i]);
-    //vec_solution.set(dofs,v);
-    
-    //int nn=
-    //std::copy(&vec_solution[0],&vec_solution[0]+nn,miov.begin());
-    
-  //for (auto v: )
-      vec_solution.close();
-    
-      return false;
-    
-  for ( ; nit != nend; ++nit)
-  {
-    const Node & node = *(*nit);
 
-    // dofs[0] is the dof number of the bounded variable at this node
-    // dofs[1] is the dof number of the lower variable at this node
-    std::vector<dof_id_type> dofs(2);
-    dofs[0] = node.dof_number(sys_num, _bounded_var_num, 0);
-    dofs[1] = node.dof_number(sys_num, _lower_var_num, 0);
+    vec_solution.close();
 
-    // soln[0] is the value of the bounded variable at this node
-    // soln[1] is the value of the lower variable at this node
-    std::vector<Number> soln(2);
-    vec_solution.get(dofs, soln);
-
-              //std::cout<<dofs[0]<<" "<<dofs[1]<<std::endl;
-      
-    // do the bounding
-//    if (soln[0] < soln[1])
-//    {
-
-      vec_solution.set(dofs[0], soln[0]); // set the bounded variable equal to the lower value
-      updatedSolution = true;
-//    }
-
-  }
+    return true;
 
   // The above vec_solution.set calls potentially added "set" commands to a queue
   // The following actions the queue (doing MPI commands if necessary), so
