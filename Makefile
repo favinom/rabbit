@@ -30,7 +30,7 @@ APPLICATION_DIR    := $(CURDIR)
 APPLICATION_NAME   := rabbit
 BUILD_EXEC         := yes
 DEP_APPS           := $(shell $(FRAMEWORK_DIR)/scripts/find_dep_apps.py $(APPLICATION_NAME))
-ADDITIONAL_LIBS    := $(HOME)/dev/lugano/ioniclib/bernus.o -L/Developer/NVIDIA/CUDA-7.5/lib -lcudart
+ADDITIONAL_LIBS    := -L$(IONICLIB_DIR) -lbernus
 include            $(FRAMEWORK_DIR)/app.mk
 
 ###############################################################################

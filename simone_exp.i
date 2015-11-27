@@ -6,11 +6,11 @@
 # uniform_refine = 0
  type = GeneratedMesh
  dim = 3
- nx = 80
+ nx = 100
  ny = 4
  nz = 4
  xmin = 0.0
- xmax = 20.0
+ xmax = 10.0
  ymin = 0.0
  ymax = 1.0
  zmin = 0.0
@@ -93,12 +93,17 @@
 # full = true
 # [../]
 # []
- 
-[Executioner]
 
-  type=Transient
-  solve_type=NEWTON
- 
+
+[Executioner]
+  type = Transient
+  solve_type = 'NEWTON'
+
+  [./TimeStepper]
+    type = ConstantDT
+    dt = 0.1
+  [../]
+
 #line_search = 'none'
  
  petsc_options_iname=' -ksp_type -pc_type -pc_factor_shift_type -pc_factor_mat_solver_package '
@@ -118,7 +123,7 @@
 #nl_max_its=10
 
   start_time=   0.0
-  end_time  =   100.0
+  end_time  =   600.0
   dtmin     =   0.1
   dtmax     =   0.1
 []

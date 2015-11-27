@@ -62,10 +62,6 @@ RichardsMultiphaseProblem::initialSetup()
   int counter = 0;
   upsol = true;
 
-  //std::cout << N << std::endl;
-  //MeshBase::node_iterator nit = _mesh.getMesh().local_nodes_begin();
-  //const MeshBase::node_iterator nend = _mesh.getMesh().local_nodes_end();
-
   FEProblem::initialSetup();
 }
 
@@ -73,12 +69,12 @@ void
 RichardsMultiphaseProblem::timestepSetup()
 {
     FEProblem::timestepSetup();
-    
+
     unsigned int sys_num = getNonlinearSystem().number();
     NumericVector<Number>& sol = _nl.solutionOld();
     MeshBase::node_iterator nit = _mesh.getMesh().local_nodes_begin();
     const MeshBase::node_iterator nend = _mesh.getMesh().local_nodes_end();
-    
+
     std::vector<dof_id_type> dofs;
     for ( ; nit != nend; ++nit)
     {
@@ -92,11 +88,11 @@ RichardsMultiphaseProblem::timestepSetup()
         ionicmodel->initstate(&v[0]);
     ionicmodel->modelstep(&v[0],_dt);
     counter++;
-    
+
     // assign back the values
     for (int i=0;i<v.size();++i)
         sol.set(dofs[i],v[i]);
-    
+
     sol.close();
 }
 
@@ -109,52 +105,5 @@ RichardsMultiphaseProblem::shouldUpdateSolution()
 bool
 RichardsMultiphaseProblem::updateSolution(NumericVector<Number>& vec_solution, NumericVector<Number>& ghosted_solution)
 {
-  std::cout<<"ciao, chiamt odopo il solver\n";
-  bool updatedSolution = false;  // this gets set to true if we needed to enforce the bound at any node
-
-  unsigned int sys_num = getNonlinearSystem().number();
-
-  // For parallel procs i believe that i have to use local_nodes_begin, rather than just nodes_begin
-  // _mesh comes from SystemBase (_mesh = getNonlinearSystem().subproblem().mesh(), and subproblem is this object)
-  MeshBase::node_iterator nit = _mesh.getMesh().local_nodes_begin();
-  const MeshBase::node_iterator nend = _mesh.getMesh().local_nodes_end();
-
-  std::vector<dof_id_type> dofs;
-    for ( ; nit != nend; ++nit)
-    {
-        const Node & node = *(*nit);
-        dofs.push_back(node.dof_number(sys_num, _bounded_var_num, 0));
-    }
-    std::vector<double> v(dofs.size());
-    vec_solution.get(dofs,v);
-
-    // update with the external solver
-    if (counter==2) ionicmodel->initstate(&v[0]);
-    //if (_dt >= 0.009)
-    ionicmodel->modelstep(&v[0],_dt/2.);
-
-    // assign back the values
-    for (int i=0;i<v.size();++i)
-        vec_solution.set(dofs[i],v[i]);
-
-    vec_solution.close();
-
-    return true;
-
-  // The above vec_solution.set calls potentially added "set" commands to a queue
-  // The following actions the queue (doing MPI commands if necessary), so
-  // vec_solution will actually be modified by this following command
-  vec_solution.close();
-
-  // if any proc updated the solution, all procs will know about it
-  _communicator.max(updatedSolution);
-
-  if (updatedSolution)
-  {
-    ghosted_solution = vec_solution;
-    ghosted_solution.close();
-  }
-
-  return updatedSolution;
-
+  return false;
 }
